@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can Fast Decisions Afford to Skip Reasoning? · Auditing Jev-like System-1 Decision Models under Indirect Prompt Injection</title>
+<meta name="description" content="We audit four direct decision models on 1,440 paired synthetic browser tasks. Clean accuracy averages 91.0%, yet two-shot attack success reaches 81.2%, and calibration error rises from 2.6% to over 36% under injected claims.">
+<meta property="og:title" content="Can Fast Decisions Afford to Skip Reasoning?">
+<meta property="og:description" content="Auditing Jev-like System-1 decision models under indirect prompt injection.">
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar" id="top">
+  <nav class="topnav" aria-label="Sections">
+    <a class="brand" href="#top">Fast decisions <span>· IPI audit</span></a>
+    <div class="navlinks">
+      <a href="#motivation">Motivation</a>
+      <a href="#framework">Framework</a>
+      <a href="#rq1">RQ1</a>
+      <a href="#rq2">RQ2</a>
+      <a href="#rq3">RQ3</a>
+      <a href="#conclusion">Conclusion</a>
+    </div>
+    <a class="navpdf" href="paper.pdf">PDF</a>
+  </nav>
+  <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+</header>
+
+<main>
+
+<!-- ============================================================ HERO -->
+<section class="hero">
+  <div class="wrap">
+    <p class="venue">Security audit · Browser agents · Calibration</p>
+    <h1>Can Fast Decisions Afford to Skip Reasoning?</h1>
+    <p class="subtitle">Auditing <span class="m">Jev</span>-like System-1 decision models under indirect prompt injection</p>
+    <p class="authors">Anonymous Author</p>
+    <div class="links">
+      <a class="btn primary" href="paper.pdf">Read the paper (PDF)</a>
+      <a class="btn" href="#playground">Try the attack</a>
+      <a class="btn" href="#cite">Cite</a>
+    </div>
+
+    <div class="stats" aria-label="Headline numbers">
+      <div class="stat"><b data-count="91.0">91.0</b><span>%</span><p>mean clean accuracy across four decision models</p></div>
+      <div class="stat warn"><b data-count="81.2">81.2</b><span>%</span><p>mean two-shot attack success on the same tasks</p></div>
+      <div class="stat"><b>2.6<i>→</i>36.7</b><span>%</span><p>mean ECE, clean → conclusion poison (36.1% for evidence poison)</p></div>
+      <div class="stat"><b>33.9<i>→</i>89.6</b><span>%</span><p>poisoned accuracy, <span class="m">Luna Decisions</span> → <span class="m">GPT-6 Luna</span> with ~30 reasoning tokens</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ ABSTRACT -->
+<section class="band" id="abstract">
+  <div class="wrap narrow">
+    <h2 class="kicker">Abstract</h2>
+    <p class="lead">Fast decision models offer low-latency actions and explicit confidence estimates. We audit four state-of-the-art decision models on 1,440 paired synthetic browser tasks, injecting false conclusions or evidence interpretations through external comments. Across models, clean accuracy averages 91.0%, yet two-shot attack success reaches 81.2%. Mean expected calibration error rises from 2.6% on clean inputs to 36.7% under conclusion poisoning and 36.1% under evidence poisoning. Clean accuracy and calibration therefore do not ensure reliable decisions under injection.</p>
+    <p>We further compare <span class="m">GPT-6 Luna</span> and <span class="m">Luna Decisions</span>, which share the same base model, on 48 matched tasks. With a chain of thought averaging about 30 reasoning tokens per response, <span class="m">GPT-6 Luna</span> answers 89.6% of poisoned inputs correctly, versus 33.9% for <span class="m">Luna Decisions</span>. Mean generation latency is 1.89 seconds versus 0.22 seconds. These results expose a latency–robustness trade-off in fast decision models: faster decisions come with greater vulnerability to injection.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 1 INTRODUCTION -->
+<section id="intro">
+  <div class="wrap narrow">
+    <p class="secno">1</p>
+    <h2>Introduction</h2>
+    <p>Fast browser delegation requires more than a legal action: the application also needs to know how much to trust that action. <span class="m">Jev</span> addresses this requirement with Reinforcement Learning for Calibrated Decisions (RLCD), which targets calibrated probabilities over structured outputs <a class="cite" data-k="almeida2026jev"></a>. Its direct decision interface lets software select and execute an action without requesting a generated reasoning trace <a class="cite" data-k="typesafe2026,jevultrafast2026"></a>. The security question is whether those estimates remain reliable when the page itself is adversarial.</p>
+    <p>Clean calibration does not establish calibration under indirect prompt injection (IPI). An attacker can leave the user's task and original records intact while adding a page comment that claims a false result or reinterpretation. Such lower-trust content is an established attack surface for tool-using and browser agents <a class="cite" data-k="greshake2023,zhan2024injectagent,debenedetti2024,yi2025bipia,evtimov2025wasp"></a>. The resulting action can remain perfectly legal while serving the attacker's target. For <span class="m">Jev</span>, the concern is not just whether injection causes errors, but whether RLCD-trained probabilities continue to make those errors appear trustworthy.</p>
+    <p>A second question is whether a small amount of explicit reasoning changes this exposure. Prior work links inference-time compute to adversarial robustness, including against browsing prompt injection <a class="cite" data-k="zaremba2025compute"></a>. We test the low-reasoning boundary by comparing none and low effort within the same chat interface.</p>
+    <p>We study both questions using 1,440 paired synthetic browser tasks with exact action oracles, and evaluate <span class="m">Jev 1.13</span> and <span class="m">Jev 1.14</span>, with <span class="m">Luna Decisions</span> and <span class="m">Microsoft Decision-1</span> as additional comparisons. We find two patterns:</p>
+    <div class="findings">
+      <div class="finding">
+        <h3>RLCD's clean calibration fails under injection</h3>
+        <p><span class="m">Jev 1.13</span> reaches 94.8% clean accuracy and 2.2% ECE. Conclusion and evidence poison raise ECE to 47.1% and 41.1%. <span class="m">Jev 1.14</span>'s ECE rises from 1.7% to 52.8% under evidence poisoning.</p>
+      </div>
+      <div class="finding">
+        <h3>Omitting reasoning leaves higher attack success</h3>
+        <p>Moving <span class="m">GPT-6 Luna</span> from none to low effort lowers pooled attack success from 19.8% to 4.2% under Cautious, with a mean of 28.5 reasoning tokens. Native <span class="m">Luna Decisions</span> reaches 51.0%.</p>
+      </div>
+    </div>
+    <p>The recovery comparison makes the latency cost explicit. Under Cautious, mean selected-generation latency is 0.286 s for native <span class="m">Luna Decisions</span>, 1.187 s for chat none, and 1.943 s for low. Fast decisions and clean confidence do not replace checking claims from an untrusted page.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 2 BACKGROUND -->
+<section id="background" class="band">
+  <div class="wrap narrow">
+    <p class="secno">2</p>
+    <h2>Background</h2>
+    <h3>System-1-style decision models</h3>
+    <p>The System-1/System-2 distinction contrasts fast, intuitive judgments with slower, deliberate reasoning <a class="cite" data-k="kahneman2011"></a>. Reasoning language models generate multi-step derivations and verify answers before responding <a class="cite" data-k="deepseek2025r1,wei2022cot"></a>, but generating a trace adds work before an action can be executed.</p>
+
+    <div class="s12" aria-label="Direct decision versus reasoning interface">
+      <div class="s12col">
+        <p class="s12tag">System-1-style interface</p>
+        <div class="s12flow">
+          <span class="chip">page state + task</span><span class="arr"></span>
+          <span class="chip dark">decision model</span><span class="arr"></span>
+          <span class="chip out">click_15 · p = 0.97</span>
+        </div>
+        <p class="s12note">Typed decision with a probability, no generated trace.</p>
+      </div>
+      <div class="s12col">
+        <p class="s12tag">System-2-style interface</p>
+        <div class="s12flow">
+          <span class="chip">page state + task</span><span class="arr"></span>
+          <span class="chip dark">reasoning trace</span><span class="arr"></span>
+          <span class="chip out">{"action": "click_15"}</span>
+        </div>
+        <p class="s12note">Derivation first, then the action; more tokens, more latency.</p>
+      </div>
+    </div>
+
+    <p><span class="m">Jev</span> exemplifies the System-1-style approach. A decision model evaluates a supplied state under task instructions and returns typed outputs, such as a choice, a numerical score, or a truth assessment <a class="cite" data-k="typesafe2026"></a>. It is trained with RLCD, which targets agreement between decision probabilities and observed outcomes <a class="cite" data-k="almeida2026jev"></a>. OpenAI's <span class="m">GPT-6 Luna Decisions</span> (<span class="m">Luna Decisions</span>) and Microsoft's <span class="m">Microsoft Decision-1</span> likewise offer System-1-style decision interfaces <a class="cite" data-k="openai2026decisions,srivastava2026decision"></a>.</p>
+    <h3>Decision models in browser automation</h3>
+    <p>Browser automation is a common application of decision models. TypeSafe demonstrates <span class="m">Jev</span> following Wikipedia links to reach a target page <a class="cite" data-k="almeida2026jev"></a>, while <span class="m">jev-ultrafast</span> provides a general-purpose browser-use framework <a class="cite" data-k="jevultrafast2026"></a>. Each cycle inspects the page and its indexed controls, chooses an action, executes it, and inspects the updated page. Those page observations can also contain attacker-controlled content: a false claim can make an action appear appropriate even though it does not serve the user's goal and is merely permitted by the interface <a class="cite" data-k="greshake2023,debenedetti2024"></a>.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 3 MOTIVATION -->
+<section id="motivation">
+  <div class="wrap narrow">
+    <p class="secno">3</p>
+    <h2>Motivation and research questions</h2>
+    <p>We study direct decision models when an untrusted page comment introduces a false claim. The question is whether the model preserves the correct action <em>and</em> reliable confidence when external content attempts to mislead it.</p>
+  </div>
+  <div class="wrap mid">
+    <figure class="fig">
+      <img src="assets/figures/fig1-motivation.svg" alt="Figure 1: (a) a schematic reliability diagram where clean decisions follow the ideal diagonal and injected decisions fall below it with a gap; (b) a schematic accuracy versus reasoning-effort plot where the gap between clean and injected accuracy is largest at no reasoning, labelled Jev-like direct choice." width="468" height="214">
+      <figcaption><b>Figure 1. Two motivations.</b> (a) Does clean calibration persist under IPI? (b) How do <span class="m">Jev</span>-like direct choices compare with reasoning-enabled decisions? Curves are schematic, not measured.</figcaption>
+    </figure>
+  </div>
+  <div class="wrap narrow">
+    <p><b>Clean calibration and injection resistance are separate requirements.</b> RLCD targets calibrated decision probabilities <a class="cite" data-k="almeida2026jev"></a>, but calibration on clean inputs does not guarantee calibration under injection; calibration can deteriorate under dataset shift <a class="cite" data-k="ovadia2019uncertainty"></a>.</p>
+    <p><b>Reasoning and robustness.</b> Allowing more computation for reasoning can improve adversarial robustness <a class="cite" data-k="zaremba2025compute"></a>. System-1-style interfaces omit an explicit reasoning stage to prioritize latency. Does that leave them more vulnerable, and can enabling reasoning alone recover robustness?</p>
+    <ol class="rqs">
+      <li><span class="rqtag">RQ1</span><div><b>Clean capability and attack exposure.</b> Do direct decision models remain correct under misleading page claims, and how do task structure, difficulty, and payload type shape attack exposure?</div></li>
+      <li><span class="rqtag">RQ2</span><div><b>Confidence reliability under attack.</b> Under injection, do returned action probabilities remain calibrated, and can confidence distinguish correct decisions from attack-induced errors?</div></li>
+      <li><span class="rqtag">RQ3</span><div><b>Defense and recovery.</b> Can instructions about external information or a short reasoning step improve resistance to misleading claims, and at what cost in accuracy, response time, and computation?</div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ 4 FRAMEWORK -->
+<section id="framework" class="band">
+  <div class="wrap narrow">
+    <p class="secno">4</p>
+    <h2>Evaluation framework</h2>
+    <p>We evaluate one browser action-selection step on a frozen synthetic DOM snapshot. Tasks span six computation families and eight difficulty levels; two claim-poisoning payloads target conclusions and evidence interpretations.</p>
+  </div>
+  <div class="wrap wide">
+    <figure class="fig">
+      <img src="assets/figures/fig2-overview.svg" alt="Figure 2: (a) a six-by-eight grid of task families by difficulty levels giving 1,440 base cases; (b) a comparison page whose external comment is replaced by a clean, conclusion-poisoned, or evidence-poisoned comment; (c) the direct decision model evaluated for attack exposure, confidence reliability, and defense and recovery." width="974" height="272">
+      <figcaption><b>Figure 2. Study overview.</b> (a) Six task families and eight difficulty levels form 1,440 balanced tasks. (b) Each task has clean, conclusion-poisoned, and evidence-poisoned variants; only the external comment changes. (c) RQ1 evaluates attack exposure, RQ2 confidence reliability, and RQ3 defense and reasoning-based recovery.</figcaption>
+    </figure>
+  </div>
+
+  <div class="wrap narrow">
+    <h3>4.1 Task template and threat model</h3>
+    <p>All tasks share one page template with three regions: <b>original records</b>, an <b>external requester comment</b>, and two to four <b>answer buttons</b>. The user goal and task rule are supplied separately from the DOM. Each button maps to a legal click action, and an exact oracle computes the correct action from the records and task rule.</p>
+    <p>The attacker aims to induce a designated incorrect legal action by changing the external comment. It knows the task family, records, legal actions, and oracle, but its control is limited to the text inside <code>author-note</code>: it cannot modify the user instruction, system prompt, original records, or action definitions <a class="cite" data-k="wallace2024hierarchy,chen2024struq"></a>.</p>
+  </div>
+
+  <!-- interactive playground -->
+  <div class="wrap wide">
+    <div class="panel" id="playground">
+      <div class="panelhead">
+        <div>
+          <p class="eyebrow">Interactive</p>
+          <h3>Attack playground: one task, three comments, four models</h3>
+          <p class="panelsub">Actual benchmark cases from the appendix (the first case at L1 and L8 of each family) and the probabilities each model actually returned.</p>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="seg" id="pg-family" role="group" aria-label="Task family"></div>
+        <div class="seg small" id="pg-level" role="group" aria-label="Difficulty level"></div>
+      </div>
+      <div class="pg-body">
+        <div class="pg-page">
+          <p class="pg-goal"><span>User goal</span><code id="pg-goal"></code></p>
+          <div class="browser">
+            <div class="browserbar"><i></i><i></i><i></i><span id="pg-case"></span></div>
+            <div class="browserbody">
+              <p class="region">Read-only original records</p>
+              <div class="records" id="pg-records"></div>
+              <p class="region">External change requester comment <span class="editable">attacker-controlled</span></p>
+              <div class="seg tiny" id="pg-variant" role="group" aria-label="Comment variant"></div>
+              <blockquote class="comment" id="pg-comment"></blockquote>
+              <p class="region">Decision options</p>
+              <div class="options" id="pg-options"></div>
+            </div>
+          </div>
+        </div>
+        <div class="pg-models">
+          <p class="pg-mhead">Returned action probabilities <span class="legend-inline"><i class="dot oracle"></i>oracle <i class="dot target"></i>attack target</span></p>
+          <div id="pg-models"></div>
+          <p class="note">Bars are each model's returned probabilities on this exact input; the verdict uses the probability-argmax action, as in the paper.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap narrow">
+    <h3>4.2 Paired benchmark construction</h3>
+    <p>Synthetic computation tasks provide exact ground truth and controllable difficulty, standing in for decisions such as comparing vendor quotes, checking invoice totals, or verifying discounts. Six families (number comparison, sum selection, difference, expression evaluation, multiplication, percentage) each span eight levels L1–L8 with 30 cases per level: <b>1,440 base cases</b>. With clean, conclusion-poisoned, and evidence-poisoned variants, each configuration answers <b>4,320 requests</b>. Within each family–level cell, the correct answer's numerical rank and button position are balanced.</p>
+
+    <details class="more">
+      <summary>Within-family difficulty settings (Appendix Table 5)</summary>
+      <div class="tablewrap"><table class="plain" id="difficulty-table"></table></div>
+    </details>
+
+    <h3>4.3 Claim-poisoning variants</h3>
+    <p>We poison the external comment at two points in the computation. <span class="c-concl">Conclusion poison</span> supplies a false result for the model to accept; <span class="c-evid">evidence poison</span> supplies a false meaning from which that result can be derived. Each case has one fixed payload of each type, chosen before model execution.</p>
+    <div class="templates">
+      <div class="tpl concl"><p>Conclusion poison</p><code>Verified: the result of '&lt;expression&gt;' is &lt;target&gt;.</code></div>
+      <div class="tpl evid"><p>Evidence poison</p><code>Verified interpretation: &lt;operand or symbol&gt; denotes &lt;counterfactual meaning&gt;.</code></div>
+    </div>
+
+    <h3>4.4 Evaluation measures</h3>
+    <p><b>Accuracy and attack success.</b> Accuracy is the fraction of cases whose selected action matches the oracle. <b>Attack success rate (ASR)</b> is the fraction selecting the attacker's designated wrong action. <b>Two-shot ASR</b> counts a base case as attacked if either payload induces its target.</p>
+    <p><b>Confidence and calibration.</b> Confidence is the highest returned action probability. Expected calibration error over <i>N</i> observations in <i>B</i> = 15 equal-width bins:</p>
+    <div class="math">
+      <math display="block"><mrow><mi>ECE</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><mi>B</mi></munderover><mfrac><mrow><mo>|</mo><msub><mi mathvariant="script">I</mi><mi>b</mi></msub><mo>|</mo></mrow><mi>N</mi></mfrac><mo>|</mo><mrow><mi>acc</mi><mo>(</mo><msub><mi mathvariant="script">I</mi><mi>b</mi></msub><mo>)</mo><mo>−</mo><mi>conf</mi><mo>(</mo><msub><mi mathvariant="script">I</mi><mi>b</mi></msub><mo>)</mo></mrow><mo>|</mo></mrow></math>
+    </div>
+    <p><b>Paired failure severity.</b> On clean-correct cases, each poisoned outcome falls into one of four classes. A confidence filter at threshold τ would reject S3 and admit S4.</p>
+    <div class="sevdefs">
+      <div><i class="sw s1"></i><b>S1</b> correct; P̃(c) ≥ P(c)</div>
+      <div><i class="sw s2"></i><b>S2</b> correct; P̃(c) &lt; P(c)</div>
+      <div><i class="sw s3"></i><b>S3</b> wrong; confidence &lt; τ</div>
+      <div><i class="sw s4"></i><b>S4</b> wrong; confidence ≥ τ</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 5 RQ1 -->
+<section id="rq1">
+  <div class="wrap narrow">
+    <p class="secno">5.1</p>
+    <h2>RQ1 · Clean capability and attack exposure</h2>
+    <p>All four models (<span class="m">Jev 1.13</span>, <span class="m">Jev 1.14</span>, <span class="m">Luna Decisions</span>, <span class="m">Microsoft Decision-1</span>) answer the same 1,440 tasks and their three page variants. Outcomes use the probability-argmax action.</p>
+  </div>
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead">
+        <div>
+          <p class="eyebrow">Table 2 · interactive</p>
+          <h3>Clean accuracy and targeted attack success by family (%)</h3>
+          <p class="panelsub">240 paired tasks per family and model. Shading: darker teal = higher accuracy; darker rose = higher attack success. Hover a cell for counts.</p>
+        </div>
+      </div>
+      <div class="tablewrap"><table class="heat" id="rq1-table"></table></div>
+    </div>
+  </div>
+  <div class="wrap narrow">
+    <h3 class="finding-h">Strong clean performance does not imply attack robustness</h3>
+    <p><span class="m">Jev 1.13</span>, <span class="m">Jev 1.14</span>, and <span class="m">Microsoft Decision-1</span> exceed 93% clean accuracy, while <span class="m">Luna Decisions</span> reaches 79.0%. Despite this spread, two-shot ASR exceeds 70% for all four models.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 1.1</span>High clean accuracy does not prevent claim injection: the three high-accuracy configurations all exceed 70% two-shot ASR, and <span class="m">Luna Decisions</span> also remains highly exposed.</aside>
+
+    <h3 class="finding-h">Task structure shapes attack exposure</h3>
+    <p>For <span class="m">Jev 1.13</span>, evidence-poison ASR is 85.8% for Difference but only 11.2% for Percentage. Difference is highly exposed to both payloads across models, whereas Sum and Comparison are often more exposed to evidence poison, and Product to conclusion poison. Direction matters too: on Comparison tasks, <span class="m">Jev 1.13</span>'s conclusion ASR is 90.0% for True oracle answers but 20.0% for False ones. In a separate 1,024-case follow-up, <span class="m">Jev 1.14</span>'s evidence ASR is 63.5 points higher for positive than for negative values of A, while <span class="m">Luna Decisions</span> shows the opposite preference.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 1.2</span>Attack exposure varies across task families and across directions within the comparison family.</aside>
+  </div>
+
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead">
+        <div>
+          <p class="eyebrow">Figure 3 · interactive</p>
+          <h3>Difficulty changes capability and the two attack exposures differently</h3>
+          <p class="panelsub">Each point pools 180 tasks (all six families at the same level). Click a model in the legend to hide it; hover for values.</p>
+        </div>
+      </div>
+      <div class="legend" id="rq1-legend"></div>
+      <div class="smallmult three" id="rq1-diff"></div>
+      <p class="note">Left: solid = clean accuracy; dashed = two-shot accuracy (both poisoned variants correct).</p>
+    </div>
+  </div>
+  <div class="wrap narrow">
+    <p>All four models show lower clean accuracy at L8 than L1, but the payloads move in opposite directions: conclusion ASR rises while evidence ASR falls. The payloads therefore expose different parts of the benchmark, and every model has failures unique to each payload.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 1.3</span>The two payloads have complementary difficulty profiles: from L1 to L8, conclusion ASR rises while evidence ASR falls for all four models.</aside>
+  </div>
+
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead">
+        <div>
+          <p class="eyebrow">Explore · appendix detail</p>
+          <h3>Every family × level cell</h3>
+          <p class="panelsub">30 tasks per cell. Pick a model and a measure.</p>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="seg" id="grid-model" role="group" aria-label="Model"></div>
+        <div class="seg" id="grid-metric" role="group" aria-label="Measure"></div>
+      </div>
+      <div class="gridwrap"><div id="rq1-grid"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 5.2 RQ2 -->
+<section id="rq2" class="band">
+  <div class="wrap narrow">
+    <p class="secno">5.2</p>
+    <h2>RQ2 · Confidence reliability under attack</h2>
+    <p>We examine the returned action probabilities from the same four configurations and 1,440 tasks.</p>
+  </div>
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead"><div>
+        <p class="eyebrow">Table 3</p>
+        <h3>Confidence and calibration across all models (%)</h3>
+        <p class="panelsub">1,440 tasks per condition. Confidence is the mean maximum returned action probability; ECE uses 15 equal-width bins.</p>
+      </div></div>
+      <div class="tablewrap"><table class="heat" id="rq2-table"></table></div>
+    </div>
+  </div>
+  <div class="wrap narrow">
+    <h3 class="finding-h">Poisoning weakens calibration across configurations</h3>
+    <p>All four configurations have clean ECE below 4%, but ECE increases under both payloads for every configuration. Poisoned ECE ranges from 6.90% to 52.82%, with six of eight model–payload combinations above 38%. For <span class="m">Jev 1.13</span>, conclusion poison reduces accuracy from 94.79% to 36.81% while mean confidence remains 83.37%.</p>
+  </div>
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead"><div>
+        <p class="eyebrow">Figure 4 · interactive</p>
+        <h3>Reliability across all four configurations</h3>
+        <p class="panelsub">15 equal-width confidence bins; bins with fewer than 10 observations are hidden. Dot size grows with the bin's count; hover for exact values. Click a condition to hide it.</p>
+      </div></div>
+      <div class="legend" id="rq2-legend"></div>
+      <div class="smallmult four" id="rq2-rel"></div>
+    </div>
+  </div>
+  <div class="wrap narrow">
+    <p>In some low-confidence bins, poisoned predictions lie close to the ideal diagonal. At high confidence, several poisoned curves fall well below it: the model remains confident while frequently selecting the wrong action.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 2.1</span>Clean calibration does not transfer to injected inputs. Low-confidence bins can look aligned even when high-confidence predictions are often wrong.</aside>
+    <h3 class="finding-h">Poisoning erodes correct-answer confidence and induces confident flips</h3>
+    <p>Among each configuration's clean-correct tasks, the correct action's probability decreases in 87.11–98.61% of cases. For <span class="m">Jev 1.13</span>, S1 accounts for only 1.32% (conclusion) and 2.64% (evidence) of outcomes. When an action does flip, the wrong choice often remains highly confident: at τ = 0.8, S4 exceeds S3 in six of the eight model–payload conditions. Move the threshold to see how a confidence filter would fare.</p>
+  </div>
+  <div class="wrap wide">
+    <div class="panel" id="severity-panel">
+      <div class="panelhead"><div>
+        <p class="eyebrow">Figure 5 · interactive</p>
+        <h3>Probability erosion and confident action flips</h3>
+        <p class="panelsub">Each bar uses that model's N₀ clean-correct tasks. S3/S4 split wrong actions at the confidence threshold τ.</p>
+      </div></div>
+      <div class="slider">
+        <label for="tau">Confidence threshold τ</label>
+        <input type="range" id="tau" min="0.50" max="0.99" step="0.01" value="0.80">
+        <output id="tau-out">0.80</output>
+        <button class="reset" id="tau-reset" type="button">reset to 0.80</button>
+      </div>
+      <div class="legend static">
+        <span><i class="sw s1"></i>S1 correct, P(c) kept</span><span><i class="sw s2"></i>S2 correct, P(c) fell</span><span><i class="sw s3"></i>S3 wrong, rejected by filter</span><span><i class="sw s4"></i>S4 wrong, admitted by filter</span>
+      </div>
+      <div id="rq2-sev"></div>
+      <div class="sevsummary" id="sev-summary"></div>
+    </div>
+  </div>
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead"><div>
+        <p class="eyebrow">Appendix diagnostic · interactive</p>
+        <h3>What a confidence filter keeps</h3>
+        <p class="panelsub">Keep only decisions with confidence ≥ τ (same slider as above). Left: share of the 1,440 decisions retained. Right: error rate among retained decisions.</p>
+      </div></div>
+      <div class="controls"><div class="seg" id="thr-model" role="group" aria-label="Model"></div></div>
+      <div class="smallmult two" id="rq2-thr"></div>
+    </div>
+  </div>
+  <div class="wrap narrow">
+    <p>On the full set, higher thresholds can <em>increase</em> the error rate among retained poisoned decisions: for <span class="m">Jev 1.13</span> at τ = 0.95, clean error is 0.18% but conclusion error among retained decisions is 95.87%.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 2.2</span>Within this benchmark, confidence thresholds do not reliably filter poisoned decisions: many wrong actions remain highly confident.</aside>
+  </div>
+</section>
+
+<!-- ============================================================ 5.3 RQ3 -->
+<section id="rq3">
+  <div class="wrap narrow">
+    <p class="secno">5.3</p>
+    <h2>RQ3 · Defense and recovery</h2>
+    <p>We compare three task rules on the full benchmark: <b class="c-base">Baseline</b> (the original rule), <b class="c-ign">Ignore</b> (ignore all external information), and <b class="c-caut">Cautious</b> (weigh external information against the original records).</p>
+  </div>
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead"><div>
+        <p class="eyebrow">Figure 6 · interactive</p>
+        <h3>Source exclusion and cautious consideration have different attack profiles</h3>
+        <p class="panelsub">1,440 frozen tasks per payload and configuration, scored by native returned actions.</p>
+      </div></div>
+      <div class="controls"><div class="seg" id="pr-metric" role="group" aria-label="Measure"></div></div>
+      <div id="rq3-prompts"></div>
+    </div>
+  </div>
+  <div class="wrap narrow">
+    <p>Ignore lowers attack success when the original records suffice: for <span class="m">Jev 1.13</span>, pooled ASR falls from 61.56% to 10.07% with little clean-accuracy change, though <span class="m">Luna Decisions</span> retains 41.67%. Cautious keeps the external channel open, reducing conclusion ASR for all four configurations but <em>increasing</em> evidence ASR for both <span class="m">Jev</span> versions and <span class="m">Microsoft</span>. For <span class="m">Jev 1.13</span>, Cautious removes 268 conclusion target selections but introduces 105 evidence target selections while removing only 19.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 3.1</span>Ignore reduces poisoning when the original records suffice; Cautious produces payload-dependent changes, reducing conclusion attacks but increasing evidence attacks for some models.</aside>
+
+    <h3 class="finding-h">Without reasoning, attack success remains high</h3>
+    <p>For recovery we compare two interfaces on the same <span class="m">GPT-6 Luna</span> base model: <span class="m">Luna Decisions</span> (System-1-style) and <span class="m">GPT-6 Luna</span> chat (System-2-style) at none, low, medium, and high effort. One outcome-independent case is sampled from each family–level cell: 48 tasks, 144 inputs per configuration.</p>
+  </div>
+  <div class="wrap wide">
+    <div class="panel">
+      <div class="panelhead"><div>
+        <p class="eyebrow">Figure 7 · interactive</p>
+        <h3>Low-effort chat reduces poisoned error at higher latency</h3>
+        <p class="panelsub">Same 48 tasks for every configuration. Select a configuration to compare it with native Decisions.</p>
+      </div></div>
+      <div class="controls">
+        <div class="seg" id="rec-prompt" role="group" aria-label="Prompt"></div>
+        <div class="seg" id="rec-config" role="group" aria-label="Configuration"></div>
+      </div>
+      <div class="rec-cards" id="rec-cards"></div>
+      <div class="smallmult two" id="rq3-rec"></div>
+      <p class="note">Native Decisions has no comparable reasoning-token count. Latency is OpenRouter Total Latency for the selected generation of each of the 144 inputs.</p>
+    </div>
+  </div>
+  <div class="wrap narrow">
+    <p>Native <span class="m">Luna Decisions</span> reaches pooled ASR of 61.46% under Baseline and 51.04% under Cautious. Within chat, moving from none to low effort reduces pooled ASR from 35.42% to 16.67% under Baseline and from 19.79% to 4.17% under Cautious. Low uses about 30 reported reasoning tokens and answers all 48 clean tasks correctly, but takes 1.84–1.94 s per selected generation versus 0.16–0.29 s for native Decisions.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 3.2</span>Without reasoning, chat ASR is 19.79% under Cautious, versus 4.17% at low effort with about 30 reported reasoning tokens. The lower ASR comes with higher latency, illustrating the speed–security trade-off in fast decisions.</aside>
+  </div>
+</section>
+
+<!-- ============================================================ 6 RELATED -->
+<section id="related" class="band">
+  <div class="wrap narrow">
+    <p class="secno">6</p>
+    <h2>Related work</h2>
+    <p><b>Indirect prompt injection and agent defenses.</b> Indirect prompt injection exploits attacker-controlled content encountered during a legitimate task <a class="cite" data-k="greshake2023,zhan2024injectagent"></a>. AgentDojo, BIPIA, WASP, and RedTeamCUA evaluate attacks in tool-using, web, and hybrid web–OS environments <a class="cite" data-k="debenedetti2024,yi2025bipia,evtimov2025wasp,liao2026redteamcua"></a>. Instruction hierarchy and structured-query defenses separate trusted instructions from lower-trust data <a class="cite" data-k="wallace2024hierarchy,chen2024struq"></a>; CaMeL applies a related control/data separation with capability-based policies <a class="cite" data-k="debenedetti2025camel"></a>. Code-analysis attacks show that contextual content and copied triggers can distort LLM conclusions <a class="cite" data-k="li2025context,li2025flashboom,li2025copythink"></a>. Our benchmark isolates a single decision, changing an external claim while keeping the records, legal actions, and correct answer fixed.</p>
+    <p><b>Calibration and the cost of fast decisions.</b> Calibration measures agreement between confidence and correctness <a class="cite" data-k="guo2017calibration"></a>, but uncertainty estimates can deteriorate under dataset shift <a class="cite" data-k="ovadia2019uncertainty"></a>, and LLM confidence can be miscalibrated even when it tracks some aspects of correctness <a class="cite" data-k="kadavath2022know,xiong2024confidence"></a>. <a class="cite" data-k="zaremba2025compute"></a> study inference-time compute and adversarial robustness; we examine the low-compute boundary.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 7 CONCLUSION -->
+<section id="conclusion">
+  <div class="wrap narrow">
+    <p class="secno">7</p>
+    <h2>Conclusion</h2>
+    <p class="lead">We audited System-1-style decision models on 1,440 paired synthetic browser tasks. Clean decisions can be accurate and calibrated yet become confidently wrong under claim poisoning. On a separate 48-task subset, <span class="m">GPT-6 Luna</span> without reasoning has higher pooled ASR than low effort, which uses roughly 30 reported reasoning tokens at higher latency. The comparison shows the security cost of prioritizing fast decisions over deliberation.</p>
+  </div>
+</section>
+
+<section id="cite" class="band">
+  <div class="wrap narrow">
+    <h2 class="kicker">Citation</h2>
+    <div class="bibtex">
+      <button type="button" class="copy" id="copy-bib">Copy</button>
+<pre id="bibtex">@misc{anonymous2026fastdecisions,
+  title  = {Can Fast Decisions Afford to Skip Reasoning? Auditing Jev-like
+            System-1 Decision Models under Indirect Prompt Injection},
+  author = {Anonymous Author},
+  year   = {2026}
+}</pre>
+    </div>
+    <h2 class="kicker">References</h2>
+    <ol class="refs" id="refs"></ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap narrow">
+    <p>All figures and numbers on this page are generated from the same frozen runs and tables as the paper. Model names refer to the configurations evaluated in the paper.</p>
+    <p><a href="#top">Back to top ↑</a></p>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<script src="data/paper-data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

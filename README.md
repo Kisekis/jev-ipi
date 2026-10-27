@@ -1,9 +1,24 @@
-# Project website
+# Paper and project website
 
-Static, dependency-free site for *Can Fast Decisions Afford to Skip Reasoning?*
+Static, dependency-free site for *Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable*
 Open `index.html` directly, or serve the folder with any static host.
 
 Live site: https://kisekis.github.io/jev-ipi/
+
+## Import into Overleaf
+
+This repository includes the complete manuscript source at its root. Import
+the repository into Overleaf and use `main.tex` as the main document with the
+pdfLaTeX compiler. The ICML style, bibliography, included sections, tables,
+and figure assets are bundled; no external experiment workspace is needed
+to compile the paper.
+
+To build locally with a TeX installation:
+
+    latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+
+The source is a publication snapshot of the local paper project. Raw experiment
+records, internal reviews, and analysis scripts are not included.
 
 ## Publish on GitHub Pages
 
@@ -19,10 +34,12 @@ Live site: https://kisekis.github.io/jev-ipi/
 - `assets/figures/` — Figures 1–2 (SVG with embedded fonts).
 - `data/paper-data.js` — every number shown on the page.
 - `paper.pdf` — the manuscript.
+- `main.tex`, `references.bib`, `icml2026.sty`, `icml2026.bst` — manuscript and venue template.
+- `sections/`, `tables/`, `figures/` — manuscript dependencies, separate from website assets.
 
 ## Regenerate the data
 
-From the paper root:
+From the original local paper workspace (the generation script is not bundled here):
 
     python scripts/build_site_data.py
 

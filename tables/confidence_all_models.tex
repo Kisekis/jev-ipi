@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\caption{\textbf{Confidence and calibration across all models (\%).} Each condition contains 1,440 tasks. Accuracy uses the common probability-argmax action rule; confidence is the mean maximum returned action probability. ECE uses 15 equal-width bins.}
+\label{tab:rq2}\label{tab:cross-calibration}
+\centering\tablefont
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l *{9}{S[table-format=3.2]}@{}}
+\toprule
+ & \multicolumn{3}{c}{\textbf{Clean}} & \multicolumn{3}{c}{\textbf{Conclusion poison}} & \multicolumn{3}{c}{\textbf{Evidence poison}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(l){8-10}
+\textbf{Model} & {Acc. $\uparrow$} & {Conf.} & {ECE $\downarrow$} & {Acc. $\uparrow$} & {Conf.} & {ECE $\downarrow$} & {Acc. $\uparrow$} & {Conf.} & {ECE $\downarrow$} \\
+\midrule
+\modelname{Jev 1.13} & 94.79 & 92.99 & 2.16 & 36.81 & 83.37 & 47.15 & 36.60 & 75.99 & 41.10 \\
+\modelname{Jev 1.14} & 96.46 & 95.37 & 1.72 & 80.49 & 86.47 & 6.90 & 27.15 & 79.87 & 52.82 \\
+\modelname{Luna Decisions} & 78.96 & 76.61 & 3.38 & 33.75 & 79.35 & 45.70 & 45.00 & 54.79 & 11.75 \\
+\modelname{Microsoft Decision-1} & 93.61 & 90.36 & 3.25 & 42.99 & 89.29 & 46.89 & 40.35 & 78.96 & 38.61 \\
+\bottomrule
+\end{tabular*}
+\end{table*}

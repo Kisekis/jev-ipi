@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Can Fast Decisions Afford to Skip Reasoning? · Auditing Jev-like System-1 Decision Models under Indirect Prompt Injection</title>
+<title>Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable</title>
 <meta name="description" content="We audit four direct decision models on 1,440 paired synthetic browser tasks. Clean accuracy averages 91.0%, yet two-shot attack success reaches 81.2%, and calibration error rises from 2.6% to over 36% under injected claims.">
-<meta property="og:title" content="Can Fast Decisions Afford to Skip Reasoning?">
+<meta property="og:title" content="Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable">
 <meta property="og:description" content="Auditing Jev-like System-1 decision models under indirect prompt injection.">
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/style.css">
@@ -34,7 +34,7 @@
 <section class="hero">
   <div class="wrap">
     <p class="venue">Security audit · Browser agents · Calibration</p>
-    <h1>Can Fast Decisions Afford to Skip Reasoning?</h1>
+    <h1>Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable</h1>
     <p class="subtitle">Auditing <span class="m">Jev</span>-like System-1 decision models under indirect prompt injection</p>
     <p class="authors">Anonymous Author</p>
     <div class="links">
@@ -394,7 +394,9 @@
     </div>
   </div>
   <div class="wrap narrow">
-    <p>Ignore lowers attack success when the original records suffice: for <span class="m">Jev 1.13</span>, pooled ASR falls from 61.56% to 10.07% with little clean-accuracy change, though <span class="m">Luna Decisions</span> retains 41.67%. Cautious keeps the external channel open, reducing conclusion ASR for all four configurations but <em>increasing</em> evidence ASR for both <span class="m">Jev</span> versions and <span class="m">Microsoft</span>. For <span class="m">Jev 1.13</span>, Cautious removes 268 conclusion target selections but introduces 105 evidence target selections while removing only 19.</p>
+    <p>Ignore lowers attack success when the original records suffice: for <span class="m">Jev 1.13</span>, pooled ASR falls from 61.56% to 10.07% with little clean-accuracy change, though <span class="m">Luna Decisions</span> retains 41.67%.</p>
+    <p>However, ignoring all external information is not suitable for every browser task. An agent asked to summarize a forum discussion, for example, must use external comments as task evidence; discarding them would remove information required to complete the task.</p>
+    <p>Cautious keeps the external channel open, reducing conclusion ASR for all four configurations but <em>increasing</em> evidence ASR for both <span class="m">Jev</span> versions and <span class="m">Microsoft</span>. For <span class="m">Jev 1.13</span>, Cautious removes 268 conclusion target selections but introduces 105 evidence target selections while removing only 19.</p>
     <aside class="takeaway"><span class="tk">Takeaway 3.1</span>Ignore reduces poisoning when the original records suffice; Cautious produces payload-dependent changes, reducing conclusion attacks but increasing evidence attacks for some models.</aside>
 
     <h3 class="finding-h">Without reasoning, attack success remains high</h3>
@@ -447,8 +449,7 @@
     <div class="bibtex">
       <button type="button" class="copy" id="copy-bib">Copy</button>
 <pre id="bibtex">@misc{anonymous2026fastdecisions,
-  title  = {Can Fast Decisions Afford to Skip Reasoning? Auditing Jev-like
-            System-1 Decision Models under Indirect Prompt Injection},
+  title  = {Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable},
   author = {Anonymous Author},
   year   = {2026}
 }</pre>

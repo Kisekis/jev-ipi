@@ -1,0 +1,11 @@
+% Appendix presentation of the directional analysis; base source remains unchanged.
+\Needspace{5\baselineskip}
+\subsection{Directional Asymmetries in Comparison}
+\label{app:directional-bias}
+The original comparison tasks show answer asymmetry: \modelname{Jev 1.13} has conclusion ASR of 90.0\% for True and 20.0\% for False oracle answers (120 cases each). The follow-up crosses eight numerical seeds with operand signs, $>$/$<$/$\geq$/$\leq$, button positions, and record orders, yielding 1,536 additional cases. We analyze the 1,024 unequal cases; the other 512 form an equality-boundary stratum. All four configurations use the original task rule under each page condition.
+
+Table~\ref{tab:comparison-directional-bias} gives six signed error gaps. Answer bias is $100(e_{\mathrm{False}}-e_{\mathrm{True}})$; its 512 matched pairs fix the records and True-button position while complementing $>\leftrightarrow<$ or $\geq\leftrightarrow\leq$. Positive values indicate excess erroneous True responses. The other gaps use 512 pairs each, holding the remaining factors fixed; operator/sign transformations can change the oracle. SA/SB denote the signs of operands A/B. Intervals use 10,000 joint bootstrap resamples of the eight numerical seeds.
+
+\input{tables/appendix/comparison_directional_bias}
+
+Under evidence poisoning, \modelname{Jev 1.14} has SA $=-63.5$ points (95\% interval $[-75.4,-51.8]$), indicating higher ASR when A is positive; \modelname{Luna Decisions} has positive SA and SB. Presentation effects also differ: \modelname{Jev 1.13} has ORD $=+10.2$ points, while \modelname{Luna Decisions} has POS $=-8.2$ points. Zero signed gaps indicate balanced errors on a dimension; accuracy and ASR measure performance separately.

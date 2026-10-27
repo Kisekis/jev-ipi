@@ -1,0 +1,47 @@
+\begin{tikzpicture}[font=\fontencoding{T1}\fontfamily{lato-TLF}\fontsize{8.5}{10}\selectfont]
+\definecolor{recbase}{HTML}{6489A3}
+\definecolor{reccaution}{HTML}{7B83BE}
+\definecolor{recgrid}{HTML}{DDE3E5}
+\node[circle,fill=recbase,inner sep=2pt] at (5.3,5.25) {};
+\node[anchor=west] at (5.48,5.25) {Baseline};
+\node[rectangle,fill=reccaution,inner sep=2pt] at (7.6,5.25) {};
+\node[anchor=west] at (7.78,5.25) {Cautious};
+\begin{axis}[anchor=south west,scale only axis,width=6.3cm,height=3.8cm,axis lines*=left,axis line style={black!55,line width=0.5pt},tick style={black!55},tick label style={font=\fontsize{8}{9}\selectfont},label style={font=\fontsize{9}{10}\selectfont},title style={font=\fontsize{9}{10}\selectfont,yshift=3pt},grid style={recgrid,line width=0.4pt},at={(0,0)},xmin=0,xmax=112,xtick={0,25,50,75,100},ymin=-15,ymax=50,ytick={-10,0,10,20,30,40,50},yticklabels={N/A,0,10,20,30,40,50},xlabel={Poisoned accuracy (\%) $\uparrow$},ylabel={Mean reasoning tokens},title={Correctness vs. reasoning cost},ymajorgrids,clip=false]
+\addplot[only marks,mark=*,mark size=2.4pt,color=recbase] coordinates {(54.17,0.0) (83.33,29.65) (91.67,37.03) (92.71,41.66)};
+\node[anchor=east,xshift=-4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:54.17,0.0) {none};
+\node[anchor=east,xshift=-4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:83.33,29.65) {low};
+\node[anchor=east,xshift=-4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:91.67,37.03) {medium};
+\node[anchor=east,xshift=-4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:92.71,41.66) {high};
+\addplot[only marks,mark=square*,mark size=2.4pt,color=reccaution] coordinates {(68.75,0.0) (95.83,28.48) (97.92,36.13) (98.96,39.35)};
+\node[anchor=west,xshift=4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:68.75,0.0) {none};
+\node[anchor=west,xshift=4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:95.83,28.48) {low};
+\node[anchor=west,xshift=4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:97.92,36.13) {medium};
+\node[anchor=west,xshift=4pt,font=\fontsize{7}{8}\selectfont,text=black!75] at (axis cs:98.96,39.35) {high};
+\draw[black!25,densely dashed] (axis cs:0,-5) -- (axis cs:112,-5);
+\node[anchor=west,font=\fontsize{7}{8}\selectfont,text=black!70] at (axis cs:60,-10) {Decisions};
+\addplot[black!35,line width=1pt] coordinates {(29.17,-10) (38.54,-10)};
+\addplot[only marks,mark=*,mark size=2.4pt,color=recbase] coordinates {(29.17,-10)};
+\node[anchor=east,xshift=-5pt,font=\fontsize{7}{8}\selectfont] at (axis cs:29.17,-10) {29.2\%};
+\addplot[only marks,mark=square*,mark size=2.4pt,color=reccaution] coordinates {(38.54,-10)};
+\node[anchor=west,xshift=5pt,font=\fontsize{7}{8}\selectfont] at (axis cs:38.54,-10) {38.5\%};
+\end{axis}
+\begin{axis}[anchor=south west,scale only axis,width=6.3cm,height=3.8cm,axis lines*=left,axis line style={black!55,line width=0.5pt},tick style={black!55},tick label style={font=\fontsize{8}{9}\selectfont},label style={font=\fontsize{9}{10}\selectfont},title style={font=\fontsize{9}{10}\selectfont,yshift=3pt},grid style={recgrid,line width=0.4pt},at={(8.2cm,0)},xmin=0,xmax=2.3,xtick={0,0.5,1,1.5,2},ymin=-0.5,ymax=4.8,ytick={0,1,2,3,4},yticklabels={high,medium,low,none,Decisions},xlabel={Mean latency (s) $\downarrow$},title={Time required},xmajorgrids]
+\addplot[black!35,line width=1pt] coordinates {(0.155,4) (0.286,4)};
+\addplot[black!35,line width=1pt] coordinates {(1.196,3) (1.187,3)};
+\addplot[black!35,line width=1pt] coordinates {(1.838,2) (1.943,2)};
+\addplot[black!35,line width=1pt] coordinates {(1.832,1) (1.96,1)};
+\addplot[black!35,line width=1pt] coordinates {(1.921,0) (1.868,0)};
+\addplot[only marks,mark=*,mark size=2.4pt,color=recbase] coordinates {(0.155,4) (1.196,3) (1.838,2) (1.832,1) (1.921,0)};
+\node[anchor=south,xshift=0pt,yshift=3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:0.155,4) {0.15};
+\node[anchor=east,xshift=-4pt,yshift=3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.196,3) {1.20};
+\node[anchor=east,xshift=-4pt,yshift=3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.838,2) {1.84};
+\node[anchor=east,xshift=-4pt,yshift=3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.832,1) {1.83};
+\node[anchor=east,xshift=-4pt,yshift=3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.921,0) {1.92};
+\addplot[only marks,mark=square*,mark size=2.4pt,color=reccaution] coordinates {(0.286,4) (1.187,3) (1.943,2) (1.96,1) (1.868,0)};
+\node[anchor=north,xshift=0pt,yshift=-3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:0.286,4) {0.29};
+\node[anchor=west,xshift=4pt,yshift=-3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.187,3) {1.19};
+\node[anchor=west,xshift=4pt,yshift=-3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.943,2) {1.94};
+\node[anchor=west,xshift=4pt,yshift=-3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.96,1) {1.96};
+\node[anchor=west,xshift=4pt,yshift=-3pt,font=\fontsize{6.5}{7}\selectfont,text=black!75] at (axis cs:1.868,0) {1.87};
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,19 @@
+% Appendix-only visual conventions. Loaded in the preamble; activated after \onecolumn.
+\usepackage{placeins}
+\usepackage{needspace}
+\DeclareCaptionFont{appendixcaption}{\fontsize{9}{11}\selectfont}
+\newcommand{\appnote}[1]{%
+  \par\smallskip\begin{minipage}{.96\linewidth}%
+  \fontsize{8.5}{10.5}\selectfont\raggedright #1%
+  \end{minipage}}
+\newcommand{\setupappendix}{%
+  \captionsetup{hypcap=false,font=appendixcaption,skip=5pt}%
+  \renewcommand{\tablefont}{\fontsize{9}{11}\selectfont}%
+  \renewcommand{\arraystretch}{1.08}%
+  \setlength{\tabcolsep}{4pt}%
+  \setlength{\textfloatsep}{10pt plus 2pt minus 2pt}%
+  \setlength{\floatsep}{9pt plus 2pt minus 2pt}%
+  \setlength{\intextsep}{9pt plus 2pt minus 2pt}%
+  \tcbset{paperexample/.append style={before skip=6pt,after skip=6pt,top=4pt,bottom=4pt}}%
+  \lstset{style=paperexample,frame=tb,framerule=.4pt,aboveskip=6pt,belowskip=6pt}%
+}

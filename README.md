@@ -17,8 +17,15 @@ To build locally with a TeX installation:
 
     latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 
-The source is a publication snapshot of the local paper project. Raw experiment
-records, internal reviews, and analysis scripts are not included.
+The LaTeX source is the same snapshot used for the downloadable paper. Raw
+provider responses and internal reviews are not included.
+
+## Code and data
+
+Download `artifacts/research_artifact.zip` for the frozen datasets, offline
+Python analysis, reference tables, and reproduction instructions. The zip is
+independent of the LaTeX build. After extraction, see its `README.md` and
+`DATA_DICTIONARY.md`. No model calls or credentials are required.
 
 ## Publish on GitHub Pages
 
@@ -33,7 +40,8 @@ records, internal reviews, and analysis scripts are not included.
 - `assets/fonts.css` — Nunito (SIL OFL 1.1, `assets/fonts/OFL.txt`) inlined, so the page also renders from `file://`.
 - `assets/figures/` — Figures 1–2 (SVG with embedded fonts).
 - `data/paper-data.js` — every number shown on the page.
-- `paper.pdf` — the manuscript.
+- `paper.pdf` — the current manuscript with author names and affiliation.
+- `artifacts/research_artifact.zip` — the standalone code and data artifact.
 - `main.tex`, `references.bib`, `icml2026.sty`, `icml2026.bst` — manuscript and venue template.
 - `sections/`, `tables/`, `figures/` — manuscript dependencies, separate from website assets.
 

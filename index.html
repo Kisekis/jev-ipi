@@ -22,6 +22,7 @@
       <a href="#rq2">RQ2</a>
       <a href="#rq3">RQ3</a>
       <a href="#conclusion">Conclusion</a>
+      <a href="#artifact">Code &amp; Data</a>
     </div>
     <a class="navpdf" href="paper.pdf">PDF</a>
   </nav>
@@ -36,9 +37,11 @@
     <p class="venue">Security audit · Browser agents · Calibration</p>
     <h1>Too Fast to Doubt? Skipping Reasoning Leaves Jev-like Models Vulnerable</h1>
     <p class="subtitle">Auditing <span class="m">Jev</span>-like System-1 decision models under indirect prompt injection</p>
-    <p class="authors">Anonymous Author</p>
+    <p class="authors">Yue Li, Hao Wu, Zenan Fu, Xiao Li, Fengyuan Xu, Sheng Zhong</p>
+    <p class="affiliation">State Key Laboratory of Novel Software Technology, Nanjing University</p>
     <div class="links">
       <a class="btn primary" href="paper.pdf">Read the paper (PDF)</a>
+      <a class="btn" href="#artifact">Code &amp; Data</a>
       <a class="btn" href="#playground">Try the attack</a>
       <a class="btn" href="#cite">Cite</a>
     </div>
@@ -444,14 +447,24 @@
   </div>
 </section>
 
+<section id="artifact">
+  <div class="wrap narrow">
+    <p class="kicker">Reproducibility</p>
+    <h2>Code &amp; Data</h2>
+    <p>Download the frozen synthetic benchmark, per-condition model outputs, and offline Python code used to recompute the paper’s metrics. The bundle covers the 1,440-task benchmark and prompt-rule comparison, the 48-task Luna recovery study, and the directional comparison appendix.</p>
+    <a class="btn primary" href="artifacts/research_artifact.zip" download>Download code &amp; data (ZIP)</a>
+    <p class="note">Includes a README, data dictionary, and checksums. Core analysis runs without credentials or model API calls.</p>
+  </div>
+</section>
+
 <section id="cite" class="band">
   <div class="wrap narrow">
     <h2 class="kicker">Citation</h2>
     <div class="bibtex">
       <button type="button" class="copy" id="copy-bib">Copy</button>
-<pre id="bibtex">@misc{anonymous2026fastdecisions,
+<pre id="bibtex">@misc{li2026toofasttodoubt,
   title  = {Too Fast to Doubt? Skipping Reasoning Leaves Jev-like Models Vulnerable},
-  author = {Anonymous Author},
+  author = {Yue Li and Hao Wu and Zenan Fu and Xiao Li and Fengyuan Xu and Sheng Zhong},
   year   = {2026}
 }</pre>
     </div>

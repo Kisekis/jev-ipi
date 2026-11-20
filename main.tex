@@ -1,33 +1,32 @@
+\pdfoutput=1
 \RequirePackage{fix-cm}
 \documentclass{article}
-% The ICML times package uses legacy font families, not TU font shapes.
-% Select T1 explicitly so bold and italic resolve under XeTeX as well.
+
+
 \usepackage[T1]{fontenc}
 \usepackage{microtype}
 \usepackage{booktabs}
 \usepackage{siunitx}
 \sisetup{detect-weight=true,detect-family=true,group-digits=false}
 \usepackage{amsmath,amssymb}
+\def\DoNotLoadEpstopdf{}
 \usepackage{graphicx}
-\usepackage{pgfplots}
-\usepgfplotslibrary{fillbetween}
 \usepackage{float}
 \usepackage{listings}
 \usepackage{tcolorbox}
 \usepackage{xcolor}
 \usepackage{colortbl}
-\usepackage{hyperref}
+\usepackage{etoolbox}
+\usepackage[hyperfootnotes=false]{hyperref}
 \usepackage[preprint]{icml2026}
 
 \input{figures/paper_palette.tex}
 \input{sections/table_style}
 \DeclareRobustCommand{\modelname}[1]{\texttt{#1}}
 
-% Shared appearance for rendered pages, payload templates, and request examples.
 \tcbset{paperexample/.style={colback=white,colframe=paperink!35,boxrule=0.4pt,arc=0pt,left=6pt,right=6pt,top=5pt,bottom=5pt,before skip=7pt,after skip=7pt,fontupper=\rmfamily\fontsize{9}{10.5}\selectfont\color{black}}}
 \lstdefinestyle{paperexample}{basicstyle=\ttfamily\fontsize{8}{10}\selectfont\color{black},columns=fullflexible,keepspaces=true,breaklines=true,breakatwhitespace=true,frame=none,aboveskip=0pt,belowskip=0pt,showstringspaces=false,escapeinside={(*@}{@*)}}
 
-% One global table/float system; no local negative vspace adjustments.
 \renewcommand{\arraystretch}{1.12}
 \setlength{\tabcolsep}{4pt}
 \arrayrulecolor{black}
@@ -54,22 +53,35 @@
 \input{figures/paper_typography.tex}
 \input{sections/appendix_style}
 \newcommand{\takeaway}[2]{\par\smallskip\noindent\textbf{Takeaway #1.} #2\par\smallskip}
-\hypersetup{linkcolor=jevblue,citecolor=jevblue,urlcolor=jevblue}
+\hypersetup{linkcolor=jevblue,citecolor=jevblue,urlcolor=jevblue,
+  pdfsubject={Robustness of browser decision models under indirect prompt injection}}
 \icmltitlerunning{Too Fast to Doubt?}
-\makeatletter
-\renewcommand{\printAffiliationsAndNotice}[1]{\global\icml@noticeprintedtrue}
-\makeatother
-\icmlsetsymbol{@anon}{}
 
-\newcommand{\liyue}[1]{\textcolor{red}{#1}}
+
+\patchcmd{\printAffiliationsAndNotice}
+  {{\bf AUTHORERR: Missing \textbackslash{}icmlcorrespondingauthor.}}
+  {}{} {\PackageError{main}{Could not omit the ICML correspondence placeholder}{Check the ICML style before building.}}
+
+\makeatletter
+\patchcmd{\printAffiliationsAndNotice}
+  {\ \\ \Notice@String}
+  {}{} {\PackageError{main}{Could not omit the ICML preprint notice}{Check the ICML style before building.}}
+\makeatother
+
 
 
 \begin{document}
 \raggedbottom
-\twocolumn[\icmltitle{Too Fast to Doubt? \\Skipping Reasoning Leaves \modelname{Jev}-like Models Vulnerable}
+\twocolumn[\icmltitle{Too Fast to Doubt? \texorpdfstring{\\}{}Skipping Reasoning Leaves \modelname{Jev}-like Models Vulnerable}
 \begin{icmlauthorlist}
-\icmlauthor{Anonymous Author}{anonymous}
+\icmlauthor{Yue Li}{nju}
+\icmlauthor{Hao Wu}{nju}
+\icmlauthor{Zenan Fu}{nju}
+\icmlauthor{Xiao Li}{nju}
+\icmlauthor{Fengyuan Xu}{nju}
+\icmlauthor{Sheng Zhong}{nju}
 \end{icmlauthorlist}
+\icmlaffiliation{nju}{State Key Laboratory of Novel Software Technology, Nanjing University}
 \icmlkeywords{browser agents, direct decision models, prompt injection, calibration, action safety}
 \vskip 0.3in]
 \printAffiliationsAndNotice{}
@@ -104,7 +116,7 @@ Our contributions are as follows:
 \begin{itemize}
 \item \textbf{Paired claim-poisoning benchmark.} We construct 1,440 paired synthetic browser tasks across six computation families and eight difficulty levels, isolating conclusion and evidence poisoning across four state-of-the-art decision models.
 \item \textbf{Diagnosing the competence trap and confident hijacking.} We show how task difficulty drives complementary payload failures across easy and hard regimes, and introduce a paired severity analysis demonstrating that high-confidence flips defeat probability-threshold filtering.
-\item \textbf{Mapping the defense and latency--robustness boundary.} Through prompt-policy and same-base reasoning comparisons, we show that cautious instructions can amplify evidence attacks, whereas a minimal reasoning budget ($\sim$30 reported tokens) restores robustness at a concrete latency cost.
+\item \textbf{Mapping the defense and latency--robustness boundary.} Through prompt-policy and same-base reasoning comparisons, we show that cautious instructions can amplify evidence attacks, whereas a minimal reasoning budget ($\sim$30 tokens) restores robustness at a concrete latency cost.
 \end{itemize}
 
 \section{Background}

@@ -4,27 +4,27 @@
 \label{tab:rq3-prompt}\label{tab:prompt-calibration}
 \centering\tablefont
 \setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}l@{\hspace{10pt}}l *{7}{S[table-format=2.2]}@{}}
+\begin{tabular}{@{}l@{\hspace{10pt}}l *{7}{S[table-format=2.2]}}
 \toprule
  & & & \multicolumn{3}{c}{\textbf{Targeted ASR $\downarrow$}} & \multicolumn{3}{c}{\textbf{ECE@15 $\downarrow$}} \\
 \cmidrule(lr){4-6}\cmidrule(l){7-9}
 \textbf{Model} & \textbf{Task rule} & {Clean acc.} & {C} & {E} & {Pooled} & {Clean} & {C} & {E} \\
 \midrule
-\modelname{Jev 1.13} & Baseline & 94.79 & 62.43 & 60.69 & 61.56 & 2.16 & 47.15 & 41.10 \\
- & Ignore & 95.35 & 7.71 & 12.43 & 10.07 & 2.35 & 3.67 & 2.22 \\
- & Cautious & 95.62 & 43.82 & 66.67 & 55.24 & 2.50 & 21.71 & 45.33 \\
+\modelname{Jev 1.13} & Baseline & \TableTint{tablemint}{95} 94.79 & \TableTint{tablelilac}{62} 62.43 & \TableTint{tablelilac}{61} 60.69 & \TableTint{tablelilac}{62} 61.56 & \TableTint{tablelilac}{2} 2.16 & \TableTint{tablelilac}{47} 47.15 & \TableTint{tablelilac}{41} 41.10 \\
+ & Ignore & \TableTint{tablemint}{95} 95.35 & \TableTint{tablelilac}{8} 7.71 & \TableTint{tablelilac}{12} 12.43 & \TableTint{tablelilac}{10} 10.07 & \TableTint{tablelilac}{2} 2.35 & \TableTint{tablelilac}{4} 3.67 & \TableTint{tablelilac}{2} 2.22 \\
+ & Cautious & \TableTint{tablemint}{96} 95.62 & \TableTint{tablelilac}{44} 43.82 & \TableTint{tablelilac}{67} 66.67 & \TableTint{tablelilac}{55} 55.24 & \TableTint{tablelilac}{3} 2.50 & \TableTint{tablelilac}{22} 21.71 & \TableTint{tablelilac}{45} 45.33 \\
 \midrule
-\modelname{Jev 1.14} & Baseline & 96.46 & 18.89 & 70.62 & 44.76 & 1.72 & 6.90 & 52.82 \\
- & Ignore & 96.39 & 3.47 & 9.51 & 6.49 & 1.36 & 1.27 & 3.37 \\
- & Cautious & 96.74 & 11.94 & 73.33 & 42.64 & 1.70 & 1.69 & 57.37 \\
+\modelname{Jev 1.14} & Baseline & \TableTint{tablemint}{96} 96.46 & \TableTint{tablelilac}{19} 18.89 & \TableTint{tablelilac}{71} 70.62 & \TableTint{tablelilac}{45} 44.76 & \TableTint{tablelilac}{2} 1.72 & \TableTint{tablelilac}{7} 6.90 & \TableTint{tablelilac}{53} 52.82 \\
+ & Ignore & \TableTint{tablemint}{96} 96.39 & \TableTint{tablelilac}{3} 3.47 & \TableTint{tablelilac}{10} 9.51 & \TableTint{tablelilac}{6} 6.49 & \TableTint{tablelilac}{1} 1.36 & \TableTint{tablelilac}{1} 1.27 & \TableTint{tablelilac}{3} 3.37 \\
+ & Cautious & \TableTint{tablemint}{97} 96.74 & \TableTint{tablelilac}{12} 11.94 & \TableTint{tablelilac}{73} 73.33 & \TableTint{tablelilac}{43} 42.64 & \TableTint{tablelilac}{2} 1.70 & \TableTint{tablelilac}{2} 1.69 & \TableTint{tablelilac}{57} 57.37 \\
 \midrule
-\modelname{Luna Decisions} & Baseline & 78.96 & 62.99 & 42.71 & 52.85 & 3.38 & 45.70 & 11.75 \\
- & Ignore & 77.85 & 50.21 & 33.12 & 41.67 & 2.02 & 34.81 & 10.55 \\
- & Cautious & 79.58 & 48.12 & 34.65 & 41.39 & 2.39 & 33.63 & 9.84 \\
+\modelname{Luna Decisions} & Baseline & \TableTint{tablemint}{79} 78.96 & \TableTint{tablelilac}{63} 62.99 & \TableTint{tablelilac}{43} 42.71 & \TableTint{tablelilac}{53} 52.85 & \TableTint{tablelilac}{3} 3.38 & \TableTint{tablelilac}{46} 45.70 & \TableTint{tablelilac}{12} 11.75 \\
+ & Ignore & \TableTint{tablemint}{78} 77.85 & \TableTint{tablelilac}{50} 50.21 & \TableTint{tablelilac}{33} 33.12 & \TableTint{tablelilac}{42} 41.67 & \TableTint{tablelilac}{2} 2.02 & \TableTint{tablelilac}{35} 34.81 & \TableTint{tablelilac}{11} 10.55 \\
+ & Cautious & \TableTint{tablemint}{80} 79.58 & \TableTint{tablelilac}{48} 48.12 & \TableTint{tablelilac}{35} 34.65 & \TableTint{tablelilac}{41} 41.39 & \TableTint{tablelilac}{2} 2.39 & \TableTint{tablelilac}{34} 33.63 & \TableTint{tablelilac}{10} 9.84 \\
 \midrule
-\modelname{Microsoft Decision-1} & Baseline & 93.61 & 56.74 & 55.97 & 56.35 & 3.25 & 46.89 & 38.61 \\
- & Ignore & 94.79 & 29.86 & 6.25 & 18.06 & 4.27 & 17.63 & 8.19 \\
- & Cautious & 95.07 & 37.78 & 61.04 & 49.41 & 4.40 & 22.22 & 44.12 \\
+\modelname{Microsoft Decision-1} & Baseline & \TableTint{tablemint}{94} 93.61 & \TableTint{tablelilac}{57} 56.74 & \TableTint{tablelilac}{56} 55.97 & \TableTint{tablelilac}{56} 56.35 & \TableTint{tablelilac}{3} 3.25 & \TableTint{tablelilac}{47} 46.89 & \TableTint{tablelilac}{39} 38.61 \\
+ & Ignore & \TableTint{tablemint}{95} 94.79 & \TableTint{tablelilac}{30} 29.86 & \TableTint{tablelilac}{6} 6.25 & \TableTint{tablelilac}{18} 18.06 & \TableTint{tablelilac}{4} 4.27 & \TableTint{tablelilac}{18} 17.63 & \TableTint{tablelilac}{8} 8.19 \\
+ & Cautious & \TableTint{tablemint}{95} 95.07 & \TableTint{tablelilac}{38} 37.78 & \TableTint{tablelilac}{61} 61.04 & \TableTint{tablelilac}{49} 49.41 & \TableTint{tablelilac}{4} 4.40 & \TableTint{tablelilac}{22} 22.22 & \TableTint{tablelilac}{44} 44.12 \\
 \bottomrule
 \end{tabular}
 \appnote{C/E denote conclusion/evidence poison. Accuracy and ASR use native choices; ECE uses probability argmax. Pooled ASR includes both payloads per task.}

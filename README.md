@@ -1,6 +1,6 @@
 # Paper and project website
 
-Static, dependency-free site for *Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable*
+Static, dependency-free site for *Too Fast to Doubt? Skipping Reasoning Leaves Jev-like Models Vulnerable*.
 Open `index.html` directly, or serve the folder with any static host.
 
 Live site: https://kisekis.github.io/jev-ipi/

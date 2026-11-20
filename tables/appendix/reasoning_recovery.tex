@@ -4,23 +4,23 @@
 \label{tab:reasoning-recovery}
 \centering\tablefont
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}ll *{5}{S[table-format=3.2]}@{}}
+\begin{tabular}{@{}ll *{5}{S[table-format=3.2]}}
 \toprule
  & & \multicolumn{2}{c}{\textbf{Accuracy $\uparrow$}} & \multicolumn{3}{c}{\textbf{Targeted ASR $\downarrow$}} \\
 \cmidrule(lr){3-4}\cmidrule(l){5-7}
 \textbf{Prompt} & \textbf{Configuration} & {Clean} & {Poisoned} & {Conclusion} & {Evidence} & {Pooled} \\
 \midrule
-Baseline & Decisions & 81.25 & 29.17 & 66.67 & 56.25 & 61.46 \\
- & none & 91.67 & 54.17 & 39.58 & 31.25 & 35.42 \\
- & low & 100.00 & 83.33 & 12.50 & 20.83 & 16.67 \\
- & medium & 100.00 & 91.67 & 4.17 & 12.50 & 8.33 \\
- & high & 100.00 & 92.71 & 4.17 & 10.42 & 7.29 \\
+Baseline & Decisions & \TableTint{tablemint}{81} 81.25 & \TableTint{tablemint}{29} 29.17 & \TableTint{tablelilac}{67} 66.67 & \TableTint{tablelilac}{56} 56.25 & \TableTint{tablelilac}{61} 61.46 \\
+ & none & \TableTint{tablemint}{92} 91.67 & \TableTint{tablemint}{54} 54.17 & \TableTint{tablelilac}{40} 39.58 & \TableTint{tablelilac}{31} 31.25 & \TableTint{tablelilac}{35} 35.42 \\
+ & low & \TableTint{tablemint}{100} 100.00 & \TableTint{tablemint}{83} 83.33 & \TableTint{tablelilac}{13} 12.50 & \TableTint{tablelilac}{21} 20.83 & \TableTint{tablelilac}{17} 16.67 \\
+ & medium & \TableTint{tablemint}{100} 100.00 & \TableTint{tablemint}{92} 91.67 & \TableTint{tablelilac}{4} 4.17 & \TableTint{tablelilac}{13} 12.50 & \TableTint{tablelilac}{8} 8.33 \\
+ & high & \TableTint{tablemint}{100} 100.00 & \TableTint{tablemint}{93} 92.71 & \TableTint{tablelilac}{4} 4.17 & \TableTint{tablelilac}{10} 10.42 & \TableTint{tablelilac}{7} 7.29 \\
 \midrule
-Cautious & Decisions & 77.08 & 38.54 & 54.17 & 47.92 & 51.04 \\
- & none & 87.50 & 68.75 & 20.83 & 18.75 & 19.79 \\
- & low & 100.00 & 95.83 & 2.08 & 6.25 & 4.17 \\
- & medium & 100.00 & 97.92 & 0.00 & 4.17 & 2.08 \\
- & high & 100.00 & 98.96 & 0.00 & 2.08 & 1.04 \\
+Cautious & Decisions & \TableTint{tablemint}{77} 77.08 & \TableTint{tablemint}{39} 38.54 & \TableTint{tablelilac}{54} 54.17 & \TableTint{tablelilac}{48} 47.92 & \TableTint{tablelilac}{51} 51.04 \\
+ & none & \TableTint{tablemint}{88} 87.50 & \TableTint{tablemint}{69} 68.75 & \TableTint{tablelilac}{21} 20.83 & \TableTint{tablelilac}{19} 18.75 & \TableTint{tablelilac}{20} 19.79 \\
+ & low & \TableTint{tablemint}{100} 100.00 & \TableTint{tablemint}{96} 95.83 & \TableTint{tablelilac}{2} 2.08 & \TableTint{tablelilac}{6} 6.25 & \TableTint{tablelilac}{4} 4.17 \\
+ & medium & \TableTint{tablemint}{100} 100.00 & \TableTint{tablemint}{98} 97.92 & \TableTint{tablelilac}{0} 0.00 & \TableTint{tablelilac}{4} 4.17 & \TableTint{tablelilac}{2} 2.08 \\
+ & high & \TableTint{tablemint}{100} 100.00 & \TableTint{tablemint}{99} 98.96 & \TableTint{tablelilac}{0} 0.00 & \TableTint{tablelilac}{2} 2.08 & \TableTint{tablelilac}{1} 1.04 \\
 \bottomrule
 \end{tabular}
 \appnote{Each prompt--configuration pair uses 48 clean and 96 poisoned observations. The Cautious-none denominator includes one unresolved format failure. Table~\ref{tab:recovery-usage} reports reasoning tokens and latency.}

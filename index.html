@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable</title>
+<title>Too Fast to Doubt? Skipping Reasoning Leaves Jev-like Models Vulnerable</title>
 <meta name="description" content="We audit four direct decision models on 1,440 paired synthetic browser tasks. Clean accuracy averages 91.0%, yet two-shot attack success reaches 81.2%, and calibration error rises from 2.6% to over 36% under injected claims.">
-<meta property="og:title" content="Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable">
-<meta property="og:description" content="Auditing Jev-like System-1 decision models under indirect prompt injection.">
+<meta property="og:title" content="Too Fast to Doubt? Skipping Reasoning Leaves Jev-like Models Vulnerable">
+<meta property="og:description" content="Four fast decision models, 1,440 paired browser tasks, and the latency–robustness trade-off under indirect prompt injection.">
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -34,7 +34,7 @@
 <section class="hero">
   <div class="wrap">
     <p class="venue">Security audit · Browser agents · Calibration</p>
-    <h1>Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable</h1>
+    <h1>Too Fast to Doubt? Skipping Reasoning Leaves Jev-like Models Vulnerable</h1>
     <p class="subtitle">Auditing <span class="m">Jev</span>-like System-1 decision models under indirect prompt injection</p>
     <p class="authors">Anonymous Author</p>
     <div class="links">
@@ -47,7 +47,7 @@
       <div class="stat"><b data-count="91.0">91.0</b><span>%</span><p>mean clean accuracy across four decision models</p></div>
       <div class="stat warn"><b data-count="81.2">81.2</b><span>%</span><p>mean two-shot attack success on the same tasks</p></div>
       <div class="stat"><b>2.6<i>→</i>36.7</b><span>%</span><p>mean ECE, clean → conclusion poison (36.1% for evidence poison)</p></div>
-      <div class="stat"><b>38.54<i>→</i>95.83</b><span>%</span><p>poisoned accuracy, <span class="m">Luna Decisions</span> → <span class="m">GPT-6 Luna</span> with fewer than 30 reasoning tokens on average</p></div>
+      <div class="stat"><b>38.54<i>→</i>95.83</b><span>%</span><p>poisoned accuracy, <span class="m">Luna Decisions</span> → <span class="m">GPT-6 Luna</span> at low effort under Cautious (&lt;30 reasoning tokens on average)</p></div>
     </div>
   </div>
 </section>
@@ -57,7 +57,7 @@
   <div class="wrap narrow">
     <h2 class="kicker">Abstract</h2>
     <p class="lead">Fast decision models offer low-latency actions and explicit confidence estimates. We audit four state-of-the-art decision models on 1,440 paired synthetic browser tasks, injecting false conclusions or evidence interpretations through external comments. Across models, clean accuracy averages 91.0%, yet two-shot attack success reaches 81.2%. Mean expected calibration error rises from 2.6% on clean inputs to 36.7% under conclusion poisoning and 36.1% under evidence poisoning. Clean accuracy and calibration therefore do not ensure reliable decisions under injection.</p>
-    <p>We further compare <span class="m">GPT-6 Luna</span> and <span class="m">Luna Decisions</span>, which share the same base model, on 48 matched tasks. With a chain of thought averaging about 30 reasoning tokens per response, <span class="m">GPT-6 Luna</span> answers 89.6% of poisoned inputs correctly, versus 33.9% for <span class="m">Luna Decisions</span>. Mean generation latency is 1.89 seconds versus 0.22 seconds. These results expose a latency–robustness trade-off in fast decision models: faster decisions come with greater vulnerability to injection.</p>
+    <p>We further compare <span class="m">GPT-6 Luna</span> and <span class="m">Luna Decisions</span>, which share the same base model, on 48 matched tasks. With a chain of thought averaging fewer than 30 reasoning tokens per response, low-effort <span class="m">GPT-6 Luna</span> answers 95.83% of poisoned inputs correctly, versus 38.54% for native <span class="m">Luna Decisions</span>, while mean selected-generation latency increases from 0.29 to 1.94 seconds. These results expose a sharp latency–robustness trade-off: skipping reasoning for sub-second speed leaves fast decision models substantially more vulnerable to deceptive web content.</p>
   </div>
 </section>
 
@@ -66,21 +66,22 @@
   <div class="wrap narrow">
     <p class="secno">1</p>
     <h2>Introduction</h2>
-    <p>Fast browser delegation requires more than a legal action: the application also needs to know how much to trust that action. <span class="m">Jev</span> addresses this requirement with Reinforcement Learning for Calibrated Decisions (RLCD), which targets calibrated probabilities over structured outputs <a class="cite" data-k="almeida2026jev"></a>. Its direct decision interface lets software select and execute an action without requesting a generated reasoning trace <a class="cite" data-k="typesafe2026,jevultrafast2026"></a>. The security question is whether those estimates remain reliable when the page itself is adversarial.</p>
-    <p>Clean calibration does not establish calibration under indirect prompt injection (IPI). An attacker can leave the user's task and original records intact while adding a page comment that claims a false result or reinterpretation. Such lower-trust content is an established attack surface for tool-using and browser agents <a class="cite" data-k="greshake2023,zhan2024injectagent,debenedetti2024,yi2025bipia,evtimov2025wasp"></a>. The resulting action can remain perfectly legal while serving the attacker's target. For <span class="m">Jev</span>, the concern is not just whether injection causes errors, but whether RLCD-trained probabilities continue to make those errors appear trustworthy.</p>
-    <p>A second question is whether a small amount of explicit reasoning changes this exposure. Prior work links inference-time compute to adversarial robustness, including against browsing prompt injection <a class="cite" data-k="zaremba2025compute"></a>. We test the low-reasoning boundary by comparing none and low effort within the same chat interface.</p>
-    <p>We study both questions using 1,440 paired synthetic browser tasks with exact action oracles, and evaluate <span class="m">Jev 1.13</span> and <span class="m">Jev 1.14</span>, with <span class="m">Luna Decisions</span> and <span class="m">Microsoft Decision-1</span> as additional comparisons. We find two patterns:</p>
+    <p>System-1-style decision models make structured choices without generating explicit reasoning traces. <span class="m">Jev</span> uses Reinforcement Learning for Calibrated Decisions (RLCD) to return a confidence estimate with each action <a class="cite" data-k="almeida2026jev,typesafe2026"></a>. For an agent that acts on web content, the security question is whether fast decisions can afford to skip reasoning <a class="cite" data-k="jevultrafast2026,greshake2023,debenedetti2024,evtimov2025wasp,zaremba2025compute"></a>.</p>
+    <p>We evaluate <span class="m">Jev 1.13</span>, <span class="m">Jev 1.14</span>, <span class="m">Luna Decisions</span>, and <span class="m">Microsoft Decision-1</span> on 1,440 paired synthetic browser tasks spanning six computation families and eight difficulty levels. Each task has a clean page and two variants that change only an external comment: one supplies a false conclusion, and the other reinterprets the original evidence.</p>
     <div class="findings">
       <div class="finding">
-        <h3>RLCD's clean calibration fails under injection</h3>
-        <p><span class="m">Jev 1.13</span> reaches 94.8% clean accuracy and 2.2% ECE. Conclusion and evidence poison raise ECE to 47.1% and 41.1%. <span class="m">Jev 1.14</span>'s ECE rises from 1.7% to 52.8% under evidence poisoning.</p>
+        <h3>The competence trap</h3>
+        <p>Across the four models, mean clean accuracy is 91.0%, yet two-shot attack success is 81.2%. From L1 to L8, conclusion attacks become more successful and evidence attacks less successful: the two payloads expose opposite ends of the difficulty range.</p>
       </div>
       <div class="finding">
-        <h3>Omitting reasoning leaves higher attack success</h3>
-        <p>Moving <span class="m">GPT-6 Luna</span> from none to low effort lowers pooled attack success from 19.8% to 4.2% under Cautious, with a mean of 28.5 reasoning tokens. Native <span class="m">Luna Decisions</span> reaches 51.0%.</p>
+        <h3>Confident hijacking</h3>
+        <p>Mean ECE rises from 2.6% on clean inputs to over 36% under either payload. Among clean-correct cases, high-confidence flips (confidence ≥ 0.8) outnumber lower-confidence flips in six of eight model–payload conditions. A tighter confidence threshold does not consistently screen out poisoned errors.</p>
+      </div>
+      <div class="finding">
+        <h3>The latency–robustness trade-off</h3>
+        <p>Cautious prompting lowers conclusion ASR but raises evidence ASR in three of four models. On the separate 48-task subset under Cautious, low-effort <span class="m">GPT-6 Luna</span> uses fewer than 30 reported reasoning tokens on average and raises poisoned accuracy from 38.54% for native <span class="m">Luna Decisions</span> to 95.83%, with mean selected-generation latency rising from 0.29 to 1.94 seconds.</p>
       </div>
     </div>
-    <p>The recovery comparison makes the latency cost explicit. Under Cautious, mean selected-generation latency is 0.286 s for native <span class="m">Luna Decisions</span>, 1.187 s for chat none, and 1.943 s for low. Fast decisions and clean confidence do not replace checking claims from an untrusted page.</p>
   </div>
 </section>
 
@@ -279,7 +280,7 @@
   </div>
   <div class="wrap narrow">
     <p>All four models show lower clean accuracy at L8 than L1, but the payloads move in opposite directions: conclusion ASR rises while evidence ASR falls. The payloads therefore expose different parts of the benchmark, and every model has failures unique to each payload.</p>
-    <aside class="takeaway"><span class="tk">Takeaway 1.3</span>The two payloads have complementary difficulty profiles: from L1 to L8, conclusion ASR rises while evidence ASR falls for all four models.</aside>
+    <aside class="takeaway"><span class="tk">Takeaway 1.3</span>The competence trap spans both ends of the difficulty range: conclusion ASR rises from L1 to L8, while evidence ASR is highest on easier tasks.</aside>
   </div>
 
   <div class="wrap wide">
@@ -396,7 +397,7 @@
   <div class="wrap narrow">
     <p>Ignore lowers attack success when the original records suffice: for <span class="m">Jev 1.13</span>, pooled ASR falls from 61.56% to 10.07% with little clean-accuracy change, though <span class="m">Luna Decisions</span> retains 41.67%.</p>
     <p>However, ignoring all external information is not suitable for every browser task. An agent asked to summarize a forum discussion, for example, must use external comments as task evidence; discarding them would remove information required to complete the task.</p>
-    <p>Cautious keeps the external channel open, reducing conclusion ASR for all four configurations but <em>increasing</em> evidence ASR for both <span class="m">Jev</span> versions and <span class="m">Microsoft</span>. For <span class="m">Jev 1.13</span>, Cautious removes 268 conclusion target selections but introduces 105 evidence target selections while removing only 19.</p>
+    <p>Cautious keeps the external channel open, reducing conclusion ASR for all four configurations but <em>increasing</em> evidence ASR for both <span class="m">Jev</span> versions and <span class="m">Microsoft Decision-1</span>. For <span class="m">Jev 1.13</span>, Cautious removes 268 conclusion target selections but introduces 105 evidence target selections while removing only 19.</p>
     <aside class="takeaway"><span class="tk">Takeaway 3.1</span>Ignore reduces poisoning when the original records suffice; Cautious produces payload-dependent changes, reducing conclusion attacks but increasing evidence attacks for some models.</aside>
 
     <h3 class="finding-h">Without reasoning, attack success remains high</h3>
@@ -406,8 +407,8 @@
     <div class="panel">
       <div class="panelhead"><div>
         <p class="eyebrow">Figure 7 · interactive</p>
-        <h3>Low-effort chat reduces poisoned error at higher latency</h3>
-        <p class="panelsub">Same 48 tasks for every configuration. Select a configuration to compare it with native Decisions.</p>
+        <h3>Low-effort chat improves poisoned accuracy at higher latency than native Decisions</h3>
+        <p class="panelsub">Same 48 tasks for every configuration. Select a prompt and chat effort to compare with native Decisions.</p>
       </div></div>
       <div class="controls">
         <div class="seg" id="rec-prompt" role="group" aria-label="Prompt"></div>
@@ -415,12 +416,12 @@
       </div>
       <div class="rec-cards" id="rec-cards"></div>
       <div class="smallmult two" id="rq3-rec"></div>
-      <p class="note">Native Decisions has no comparable reasoning-token count. Latency is OpenRouter Total Latency for the selected generation of each of the 144 inputs.</p>
+      <p class="note">Native Decisions has no comparable reasoning-token count. Latency is OpenRouter Total Latency for the selected generation of each of the 144 inputs. Between-prompt latency differences are descriptive because the prompts ran in different batches. <a href="figures/recovery_comparison_compact.pdf">View the paper’s Figure 7 (PDF).</a></p>
     </div>
   </div>
   <div class="wrap narrow">
-    <p>Native <span class="m">Luna Decisions</span> reaches pooled ASR of 61.46% under Baseline and 51.04% under Cautious. Within chat, moving from none to low effort reduces pooled ASR from 35.42% to 16.67% under Baseline and from 19.79% to 4.17% under Cautious. Low uses about 30 reported reasoning tokens and answers all 48 clean tasks correctly, but takes 1.84–1.94 s per selected generation versus 0.16–0.29 s for native Decisions.</p>
-    <aside class="takeaway"><span class="tk">Takeaway 3.2</span>Without reasoning, chat ASR is 19.79% under Cautious, versus 4.17% at low effort with about 30 reported reasoning tokens. The lower ASR comes with higher latency, illustrating the speed–security trade-off in fast decisions.</aside>
+    <p>Native <span class="m">Luna Decisions</span> reaches 29.17% poisoned accuracy under Baseline and 38.54% under Cautious. Low-effort <span class="m">GPT-6 Luna</span> raises this to 83.33% and 95.83%, respectively, while answering all 48 clean tasks correctly. Within chat, moving from none to low effort reduces pooled ASR from 35.42% to 16.67% under Baseline and from 19.79% to 4.17% under Cautious.</p>
+    <aside class="takeaway"><span class="tk">Takeaway 3.2</span>Under Cautious, moving from native <span class="m">Luna Decisions</span> to low-effort <span class="m">GPT-6 Luna</span> raises poisoned accuracy from 38.54% to 95.83% (pooled ASR falls from 51.04% to 4.17%) while mean latency rises from 0.29 to 1.94 seconds.</aside>
   </div>
 </section>
 
@@ -439,7 +440,7 @@
   <div class="wrap narrow">
     <p class="secno">7</p>
     <h2>Conclusion</h2>
-    <p class="lead">We audited System-1-style decision models on 1,440 paired synthetic browser tasks. Clean decisions can be accurate and calibrated yet become confidently wrong under claim poisoning. On a separate 48-task subset, <span class="m">GPT-6 Luna</span> without reasoning has higher pooled ASR than low effort, which uses roughly 30 reported reasoning tokens at higher latency. The comparison shows the security cost of prioritizing fast decisions over deliberation.</p>
+    <p class="lead">We audited four System-1-style decision models across 1,440 paired browser tasks under conclusion and evidence poisoning. Despite high clean accuracy and tight clean calibration, direct decision models fall into a competence trap across easy and hard tasks, and suffer high-confidence flips that defeat probability-threshold filtering. Furthermore, while instructing models to cautiously weigh external claims can inadvertently amplify evidence-poisoning attacks, enabling fewer than 30 reasoning tokens per response on average in a same-base model lifts poisoned accuracy from 38.54% to 95.83% at the cost of higher latency. Sub-second decision interfaces thus trade away the minimal deliberation needed to verify untrusted web content.</p>
   </div>
 </section>
 
@@ -449,7 +450,7 @@
     <div class="bibtex">
       <button type="button" class="copy" id="copy-bib">Copy</button>
 <pre id="bibtex">@misc{anonymous2026fastdecisions,
-  title  = {Is Speed Worth the Risk? Skipping Reasoning Leaves Jev-like Models Vulnerable},
+  title  = {Too Fast to Doubt? Skipping Reasoning Leaves Jev-like Models Vulnerable},
   author = {Anonymous Author},
   year   = {2026}
 }</pre>

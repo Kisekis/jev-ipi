@@ -100,6 +100,7 @@ section.band { background: var(--band); border-top: 1px solid var(--rule); borde
 
 /* ---------------------------------------------------------------- intro findings */
 .findings { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 6px 0 22px; }
+.finding:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .finding { border-left: 3px solid var(--ink); padding: 2px 0 2px 16px; }
 .finding h3 { margin: 0 0 6px; font-size: 17px; }
 .finding p { font-size: 15.5px; color: var(--ink2); margin: 0; }
